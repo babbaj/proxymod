@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "package": "net.futureclient.proxymod.mixin.mixins",
+  "refmap": "mixins.proxy.refmap.json",
+  "client": [
+    "MixinExample"
+  ]
+}
