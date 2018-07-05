@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "proxymod",
+  "name": "Proxy Mod",
+  "description": "Give the proxy the shared key so it can werk",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["babbaj"],
+  "credits": "all me",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
