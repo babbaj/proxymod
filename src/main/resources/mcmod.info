@@ -7,8 +7,8 @@
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["babbaj"],
-  "credits": "all me",
+  "authorList": ["babbaj", "0x22"],
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
