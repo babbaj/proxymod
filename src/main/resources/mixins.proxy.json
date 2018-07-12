@@ -2,9 +2,10 @@
   "required": true,
   "minVersion": "0.7.10",
   "compatibilityLevel": "JAVA_8",
-  "package": "net.futureclient.proxymod.mixin.mixins",
+  "package": "net.futureclient.proxymod.mixins",
   "refmap": "mixins.proxy.refmap.json",
   "client": [
-    "NetHandlerLoginClientPatch"
+    "EntityPlayerSPPatch",
+    "NetworkManagerPatch"
   ]
 }
