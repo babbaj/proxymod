@@ -3,18 +3,20 @@ package net.futureclient.proxymod;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.Packet;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.*;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.network.play.server.SPacketCustomPayload;
 import net.minecraft.util.CryptManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -44,7 +46,9 @@ public class ProtocolHandler {
                     Optional<Consumer<PacketBuffer>> optionalFunc =
                             Optional.of(payloadPacket)
                             .flatMap(payload -> {
-                                final String channelName = CHANEL_PATTERN.matcher(payload.getChannelName()).group("name");
+                                final Matcher matcher = CHANEL_PATTERN.matcher(payload.getChannelName());
+                                if (!matcher.matches()) throw new IllegalStateException("Failed to find match for \"" + payload.getChannelName() + "\"");
+                                final String channelName = matcher.group("name");
                                 return ProxyProtocol.getResponseHandler(channelName);
                             });
                     if (!optionalFunc.isPresent()) {
@@ -57,10 +61,12 @@ public class ProtocolHandler {
 
 
     private static void onAuthRequest(PacketBuffer payload) {
-        final PublicKey publicKey = CryptManager.decodePublicKey(payload.readByteArray());
-        final SecretKey secretKey = EncyptionUtil.decodeSecretKey(payload.readByteArray());
+        /*final PublicKey publicKey = CryptManager.decodePublicKey(payload.readByteArray());
+        final SecretKey secretKey = new SecretKeySpec(payload.readByteArray(), "AES");
+        final String hash = (new BigInteger(CryptManager.getServerIdHash("", publicKey, secretKey))).toString(16);*/
 
-        final String hash = (new BigInteger(CryptManager.getServerIdHash("", publicKey, secretKey))).toString(16);
+        // hash is computed with the target server's public key and the secret key shared between the client and the proxy
+        final String hash = payload.readString(32767);
 
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         if (authenticate(hash)) {
@@ -72,8 +78,6 @@ public class ProtocolHandler {
         }
         CPacketCustomPayload packet = new CPacketCustomPayload("PROXY|ConfirmAuth", buffer);
         sendPacket(packet);
-        // TODO: enable encryption with secretKey
-
     }
 
     private static boolean authenticate(String hash) {
@@ -101,7 +105,6 @@ public class ProtocolHandler {
             this.channel = channel;
             this.handler = handler;
         }
-
 
         public static Optional<Consumer<PacketBuffer>> getResponseHandler(String channelIn) {
             return Stream.of(values())
