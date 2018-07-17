@@ -6,14 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.*;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.network.play.server.SPacketCustomPayload;
-import net.minecraft.util.CryptManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
-import java.security.PublicKey;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -26,15 +20,22 @@ public class ProtocolHandler {
 
     private static final Pattern CHANEL_PATTERN = Pattern.compile("PROXY\\|(?<name>.+)");
 
-    private static boolean awaitingProxyJoin = false;
-    public static boolean isConnectedToProxy = false;
+    // Used to make sure we don't handle (((unauthorized))) auth requests.
+    // A bad proxy can mess this up but we're guaranteed to be safe from (((them))).
+    // 2 lazy to add events to make sure this is correct
+    public static ProtocolState protocolState = ProtocolState.IDLE;
+
+    // unused
+    //public static boolean isConnectedToProxy = false;
+
 
     // client wants to tell the proxy to join a server
-    public static void onProxyConnect(String ip) {
+    public static void onProxyJoinRequest(String ip) {
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeString(ip);
         CPacketCustomPayload packet = new CPacketCustomPayload("PROXY|JoinRequest", buffer);
         sendPacket(packet);
+        protocolState = ProtocolState.AWAITING_AUTH;
     }
 
     public static void onPacketReceived(Packet<?> packet) {
@@ -61,14 +62,18 @@ public class ProtocolHandler {
 
 
     private static void onAuthRequest(PacketBuffer payload) {
-        /*final PublicKey publicKey = CryptManager.decodePublicKey(payload.readByteArray());
-        final SecretKey secretKey = new SecretKeySpec(payload.readByteArray(), "AES");
-        final String hash = (new BigInteger(CryptManager.getServerIdHash("", publicKey, secretKey))).toString(16);*/
+        final PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        final CPacketCustomPayload packet = new CPacketCustomPayload("PROXY|ConfirmAuth", buffer);
+
+        if (protocolState != ProtocolState.AWAITING_AUTH) {
+            // don't auth but tell them we failed to be polite :^)
+            buffer.writeBoolean(false);
+            sendPacket(packet);
+            return;
+        }
 
         // hash is computed with the target server's public key and the secret key shared between the client and the proxy
         final String hash = payload.readString(32767);
-
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         if (authenticate(hash)) {
             // success
             buffer.writeBoolean(true);
@@ -76,8 +81,9 @@ public class ProtocolHandler {
             // fail
             buffer.writeBoolean(false);
         }
-        CPacketCustomPayload packet = new CPacketCustomPayload("PROXY|ConfirmAuth", buffer);
+
         sendPacket(packet);
+        protocolState = ProtocolState.AWAITING_CONNECTION;
     }
 
     private static boolean authenticate(String hash) {
@@ -91,12 +97,21 @@ public class ProtocolHandler {
         }
     }
 
+    // sent if joining a server failed for whatever reason
+    private static void onProxyFail(PacketBuffer buffer) {
+        // just let the server tell us through chat
+        //String reason = buffer.readString(32767);
+        protocolState = ProtocolState.IDLE;
+    }
+
     private static void sendPacket(Packet<?> packetOut) {
         FMLClientHandler.instance().getClientToServerNetworkManager().sendPacket(packetOut);
     }
 
     private enum ProxyProtocol {
-        AUTH_REQUEST("AuthRequest", ProtocolHandler::onAuthRequest);
+        AUTH_REQUEST("AuthRequest", ProtocolHandler::onAuthRequest),
+        CONFIRM_JOIN("ConfirmJoin", buffer -> protocolState = ProtocolState.CONNECTED),
+        FAIL("Fail", ProtocolHandler::onProxyFail);
 
         private final String channel;
         private final Consumer<PacketBuffer> handler;

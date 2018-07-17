@@ -20,7 +20,7 @@ public class EntityPlayerSPPatch {
         Matcher matcher;
         if ((matcher = COMMAND_PATTERN.matcher(message)).matches()) {
             final String ip = matcher.group(1).trim();
-            ProtocolHandler.onProxyConnect(ip);
+            ProtocolHandler.onProxyJoinRequest(ip);
         }
     }
 }
