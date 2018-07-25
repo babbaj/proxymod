@@ -16,7 +16,7 @@ public class EntityPlayerSPPatch {
     private static final Pattern COMMAND_PATTERN = Pattern.compile("/proxyconnect\\s+(.+)");
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"))
-    public void sendChatMessage(String message, CallbackInfo cb) {
+    private void sendChatMessage(String message, CallbackInfo cb) {
         Matcher matcher;
         if ((matcher = COMMAND_PATTERN.matcher(message)).matches()) {
             final String ip = matcher.group(1).trim();

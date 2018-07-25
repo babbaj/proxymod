@@ -10,8 +10,6 @@ import java.util.Map;
 
 public class MixinLoaderForge implements IFMLLoadingPlugin {
 
-    public static boolean isObfuscatedEnvironment = false;
-
     public MixinLoaderForge() {
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.proxy.json");
@@ -34,9 +32,7 @@ public class MixinLoaderForge implements IFMLLoadingPlugin {
     }
 
     @Override
-    public void injectData(Map<String, Object> data) {
-        isObfuscatedEnvironment = (boolean) (Boolean) data.get("runtimeDeobfuscationEnabled");
-    }
+    public void injectData(Map<String, Object> data) {}
 
     @Override
     public String getAccessTransformerClass() {

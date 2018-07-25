@@ -3,17 +3,15 @@ package net.futureclient.proxymod;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLModDisabledEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ProxyMod.MODID, name = ProxyMod.NAME, version = ProxyMod.VERSION, clientSideOnly = true, canBeDeactivated = true)
+@Mod(modid = ProxyMod.MODID, name = ProxyMod.NAME, version = ProxyMod.VERSION, clientSideOnly = true)
 public class ProxyMod {
 
     public static final String MODID = "proxymod";
     public static final String NAME = "Proxy Mod";
     public static final String VERSION = "1.0";
-    public static boolean enabled = true;
 
     private static Logger logger;
 
@@ -25,10 +23,5 @@ public class ProxyMod {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         logger.info("Proxymod initialised.");
-    }
-
-    @EventHandler
-    public void onDisable(FMLModDisabledEvent event) {
-        enabled = false;
     }
 }
