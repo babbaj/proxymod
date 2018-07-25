@@ -33,7 +33,7 @@ minecraft {
     version = project.forgeVersion
     runDir = 'run'
     mappings = project.mcpVersion
-    coreMod = 'net.futureclient.proxymod.mixin.MixinLoaderForge'
+    coreMod = 'net.futureclient.proxymod.MixinLoaderForge'
     makeObfSourceJar = false
 }
 
@@ -104,7 +104,7 @@ jar {
                 'tweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
                 'TweakOrder': 0,
                 'FMLCorePluginContainsFMLMod': 'true',
-                'FMLCorePlugin': 'net.futureclient.proxymod.mixin.MixinLoaderForge',
+                'FMLCorePlugin': 'net.futureclient.proxymod.MixinLoaderForge',
                 'ForceLoadAsMod': 'true',
                 'FMLAT': 'proxy_at.cfg'
         )
