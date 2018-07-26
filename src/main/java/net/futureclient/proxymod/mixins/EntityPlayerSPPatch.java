@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 @Mixin(EntityPlayerSP.class)
 public class EntityPlayerSPPatch {
 
-    private static final Pattern COMMAND_PATTERN = Pattern.compile("/proxyconnect\\s+(.+)");
+    private static final Pattern COMMAND_PATTERN = Pattern.compile("/proxy connect\\s+(.+)");
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"))
     private void sendChatMessage(String message, CallbackInfo cb) {
         Matcher matcher;
-        if ((matcher = COMMAND_PATTERN.matcher(message)).matches()) {
+        if ((matcher = COMMAND_PATTERN.matcher(message)).matches()) { //TODO: make work with uppercase?
             final String ip = matcher.group(1).trim();
             ProtocolHandler.onProxyJoinRequest(ip);
         }
