@@ -53,8 +53,8 @@ public class ProtocolHandler {
                                 return ProxyProtocol.getResponseHandler(channelName);
                             });
                     if (!optionalFunc.isPresent()) {
-                        // TODO: handle this better
-                        throw new IllegalStateException("Unknown proxy protocol: " + payloadPacket.getChannelName());
+                        //throw new IllegalStateException("Unknown proxy protocol: " + payloadPacket.getChannelName());
+                        System.err.println("Unknown proxy protocol: " + payloadPacket.getChannelName());
                     }
                     optionalFunc.get().accept(payloadPacket.getBufferData());
                 });
@@ -111,6 +111,7 @@ public class ProtocolHandler {
     private enum ProxyProtocol {
         AUTH_REQUEST("AuthRequest", ProtocolHandler::onAuthRequest),
         CONFIRM_JOIN("ConfirmJoin", buffer -> protocolState = ProtocolState.CONNECTED),
+
         FAIL("Fail", ProtocolHandler::onProxyFail);
 
         private final String channel;
