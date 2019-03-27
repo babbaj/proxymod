@@ -9,6 +9,7 @@ buildscript {
             name = 'SpongePowered'
             url = 'http://repo.spongepowered.org/maven'
         }
+
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
@@ -28,6 +29,7 @@ sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
 }
+
 
 minecraft {
     version = project.forgeVersion
@@ -52,7 +54,9 @@ dependencies {
         exclude module: 'gson'
         exclude module: 'commons-io'
     }
+
 }
+
 
 processResources {
     // this will ensure that this task is redone when the versions change.
@@ -79,6 +83,9 @@ processResources {
 shadowJar {
     dependencies {
         include(dependency('org.spongepowered:mixin'))
+
+        include(dependency(files("$rootDir/libs/asmlib-0.1-SNAPSHOT.jar")))
+
     }
     exclude 'dummyThing'
     exclude 'LICENSE.txt'
