@@ -22,8 +22,10 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version project.modVersion
-group project.modGroup // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+
+
+//version project.modVersion
+//group project.modGroup // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
@@ -32,9 +34,9 @@ compileJava {
 
 
 minecraft {
-    version = project.forgeVersion
+    version = '1.12.2-14.23.5.2846'
     runDir = 'run'
-    mappings = project.mcpVersion
+    mappings = 'stable_39'
     coreMod = 'net.futureclient.proxymod.MixinLoaderForge'
     makeObfSourceJar = false
 }
@@ -83,9 +85,6 @@ processResources {
 shadowJar {
     dependencies {
         include(dependency('org.spongepowered:mixin'))
-
-        include(dependency(files("$rootDir/libs/asmlib-0.1-SNAPSHOT.jar")))
-
     }
     exclude 'dummyThing'
     exclude 'LICENSE.txt'
